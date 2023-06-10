@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag and Drop Example</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .container .source, .container .target {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            overflow: auto;
+        }
+        .container .source img {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .container .target {
+            background-color: #f2f2f2;
+        }
+        .container .target .dropped-image {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+        }
+        .container .target .dropped-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .container .target p {
+            text-align: center;
+            color: #888;
+        }
+        .dragging {
+            opacity: 0.5;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (min-width: 768px) {
+            .container .source, .container .target {
+                width: 45%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Drag and Drop Example</h1>
+    <div class="container">
+        <div class="source">
+            <h2>Source Container</h2>
+            <img src="pubg.png" draggable="true" ondragstart="drag(event)" />
+            <img src="rback.png" draggable="true" ondragstart="drag(event)" />
+            <img src="rback2.png" draggable="true" ondragstart="drag(event)" />
+        </div>
+        <div class="target" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>Target Container</h2>
+            <div class="dropped-images">
+                <p>Drag and drop items here</p>
+            </div>
+        </div>
+    </div>
+    <button onclick="reset()">Reset</button>
+    
+    <script>
+        var originalSourceContent;
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text/plain", event.target.src);
+            event.target.classList.add("dragging");
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            var data = event.dataTransfer.getData("text/plain");
+            var image = document.createElement("img");
+            image.src = data;
+            var droppedImages = event.target.querySelector(".dropped-images");
+            droppedImages.appendChild(createDroppedImageElement(image.src));
+            event.target.querySelector("p").style.display = "none";
+            event.target.classList.remove("dragging");
+            showMessage("Item dropped successfully!");
+        }
+
+        function createDroppedImageElement(src) {
+            var droppedImage = document.createElement("div");
+            droppedImage.classList.add("dropped-image");
+            var image = document.createElement("img");
+            image.src = src;
+            droppedImage.appendChild(image);
+            return droppedImage;
+        }
+
+        function reset() {
+            var source = document.querySelector(".source");
+            var target = document.querySelector(".target");
+
+            // Reset source
+            source.innerHTML = originalSourceContent;
+
+            // Reset target 
+            var droppedImages = target.querySelector(".dropped-images");
+            droppedImages.innerHTML = "<p>Drag and drop items here</p>";
+        }
+
+        function showMessage(message) {
+            var successMessage = document.createElement("div");
+            successMessage.classList.add("success-message");
+            successMessage.textContent = message;
+            document.body.appendChild(successMessage);
+            setTimeout(function() {
+                successMessage.parentNode.removeChild(successMessage);
+            }, 3000);
+        }
+
+        // Store original source content
+        window.onload = function() {
+            var source = document.querySelector(".source");
+            originalSourceContent = source.innerHTML;
+        };
+    </script>
+</body>
+</html>
